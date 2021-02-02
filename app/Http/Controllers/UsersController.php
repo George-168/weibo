@@ -40,4 +40,32 @@ class UsersController extends Controller
         
 
     }
+
+    public function edit(User $user)
+    {
+        return view('users.edit', compact('user'));
+    }
+
+    public function update(User $user, Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required|max:50',
+            'password' => 'nullable|confirmed|min:6'
+        ]);
+
+        // $user->name = $request->name;
+        // $user->password = $request->password;
+        // $user->save();
+
+        $data = [];
+        $data['name'] = $request->name;
+        if ($request->password) {
+            $data['password'] = bcrypt($request->password);
+        }
+        $user->update($data);
+
+        session()->flash('success', 'Personal details updated!');
+        
+        return redirect()->route('users.show', $user->id);
+    }
 }
